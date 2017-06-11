@@ -5,6 +5,7 @@ const Image = require('./Image');
 class User {
 
   get profilePicture() {
+    if (!this.profilePictureId) return null;
     return Image.findById(this.profilePictureId);
   }
 

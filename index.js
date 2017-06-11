@@ -22,7 +22,7 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://olwisconse.surge.sh'],
+  origin: ['http://localhost:3000', 'https://olwisconse.surge.sh'],
   credentials: true
 }));
 
