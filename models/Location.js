@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const { Image } = require('./index');
+const Image = require('./Image');
 
 class Location {
 

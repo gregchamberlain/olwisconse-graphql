@@ -5,6 +5,8 @@ const { User, Location, Quote, Image } = require('../models');
 
 const s3 = new aws.S3();
 
+const generateSessionToken = () => Math.random().toString(36).substring(7);
+
 const resolvers = {
   Query: {
     currentUser(_, args, { req }) {
@@ -30,42 +32,44 @@ const resolvers = {
     }
   },
   Mutation: {
-    signup(_, { user }) {
+    signup(_, { user }, { res }) {
       const salt = bcrypt.genSaltSync(10);
       const passwordDigest = bcrypt.hashSync(user.password, salt);
       return User.create({
         username: user.username.toLowerCase(),
         displayName: user.displayName,
         passwordDigest,
-        sessionToken: ( Math.floor( Math.random() * 100000 ) ).toString() }
-      );
+        sessionToken: generateSessionToken()
+      }).then(newUser => {
+        res.cookie(process.env.SESSION_COOKIE_NAME, newUser.sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+        return newUser;
+      });
     },
     login(_, { user }, { res }) {
       return User.findOne({ username: user.username.toLowerCase() }).then(currentUser => {
         if (!currentUser) throw new Error('User does not exist.');
         if (bcrypt.compareSync(user.password, currentUser.passwordDigest)) {
-          res.cookie('OLWISCONSE_SESSION', currentUser.sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+          res.cookie(process.env.SESSION_COOKIE_NAME, currentUser.sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
           return currentUser;
         } else {
           throw new Error('Invalid password for that username.')
         }
       })
     },
-    async logout(_, args, { req, res }) {
+    logout(_, args, { req, res }) {
       if (req.user) {
-        res.clearCookie('OLWISCONE_SESSION');
+        res.clearCookie(process.env.SESSION_COOKIE_NAME);
         req.user.sessionToken = generateSessionToken();
-        await req.user.save();
-        return req.user;
+        return req.user.save().then(() => req.user);
       } else {
         return null;
       }
     },
-    async updateProfilePicture(_, { url }, { req }) {
-      const image = await Image.create({ url, people: [req.user.id], owner: req.user.id });
-      req.user.profilePicture = image.id;
-      await req.user.save();
-      return image;
+    updateProfilePicture(_, { url }, { req }) {
+      Image.create({ url, people: [req.user.id], owner: req.user.id }).then(image => {
+        req.user.profilePicture = image.id;
+        return req.user.save().then(() => image);
+      });
     },
     getSignedUrl(_, { filename, filetype}) {
       const params = {
@@ -91,9 +95,6 @@ const resolvers = {
     },
     createLocation(_, { location }) {
       return Location.create(location);
-    },
-    createQuote(_, { quote }, { req }) {
-      return Quote.create({ ...quote, owner: req.user.id });
     },
     createImages(_, { urls }, { req }) {
       const images = urls.map(url => ({ url, owner: req.user.id }));

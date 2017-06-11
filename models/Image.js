@@ -1,23 +1,24 @@
 const mongoose = require('mongoose');
 
-const { User, Location } = require('./index');
+const User = require('./User');
+const Location = require('./Location');
 
 class Image {
 
   get owner() {
-    return User.findById(this.owner);
+    return User.findById(this.ownerId);
   }
 
   get location() {
-    return Location.findById(this.location);
+    return Location.findById(this.locationId);
   }
 
   get people() {
-    if (!this.people.length) return this.people;
-    return User.find({ _id: { $in: this.people } });
+    if (!this.peopleIds.length) return this.peopleIds;
+    return User.find({ _id: { $in: this.peopleIds } });
   }
 
-  get createdAt() {
+  get createdAtISO() {
     return this.createdAt.toISOString();
   }
 
@@ -25,10 +26,10 @@ class Image {
 
 const ImageSchema = new mongoose.Schema({
   url: { type: String, required: true },
-  location: { type: mongoose.Schema.Types.ObjectId, ref: 'Place' },
+  locationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Place' },
   caption: { type: String },
-  owner: {type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  people: [{type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  ownerId: {type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  peopleIds: [{type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, {
   timestamps: true
 });
