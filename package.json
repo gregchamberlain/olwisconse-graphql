@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "aws-sdk": "^2.67.0",
+    "bcrypt": "^1.0.2",
+    "body-parser": "^1.17.2",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.3",
+    "express": "^4.15.3",
+    "graphql": "^0.10.1",
+    "graphql-server-express": "^0.8.0",
+    "graphql-tools": "^1.0.0",
+    "mongoose": "^4.10.5"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  }
+}
