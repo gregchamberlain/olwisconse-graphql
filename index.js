@@ -26,7 +26,7 @@ app.use(cors({
   credentials: true
 }));
 
-const { User } = require('./models');
+const User = require('./models/User');
 
 app.use(cookieParser(), (req, res, next) => {
   const sessionToken = req.cookies[process.env.SESSION_COOKIE_NAME];

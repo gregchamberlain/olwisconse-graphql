@@ -14,7 +14,7 @@ type Image {
   caption: String
   location: Location
   people: [User]
-  createdAt: String
+  createdAtISO: String
   updatedAt: String
 }
 

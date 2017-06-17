@@ -6,16 +6,16 @@ const Location = require('./Location');
 class Image {
 
   get owner() {
-    return User.findById(this.ownerId);
+    return mongoose.connection.models.User.findById(this.ownerId);
   }
 
   get location() {
-    return Location.findById(this.locationId);
+    return mongoose.connection.models.Location.findById(this.locationId);
   }
 
   get people() {
     if (!this.peopleIds.length) return this.peopleIds;
-    return User.find({ _id: { $in: this.peopleIds } });
+    return mongoose.connection.models.User.find({ _id: { $in: this.peopleIds } });
   }
 
   get createdAtISO() {

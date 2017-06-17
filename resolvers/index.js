@@ -66,7 +66,7 @@ const resolvers = {
       }
     },
     updateProfilePicture(_, { url }, { req }) {
-      Image.create({ url, people: [req.user.id], owner: req.user.id }).then(image => {
+      Image.create({ url, peopleIds: [req.user.id], ownerId: req.user.id }).then(image => {
         req.user.profilePicture = image.id;
         return req.user.save().then(() => image);
       });
@@ -97,7 +97,7 @@ const resolvers = {
       return Location.create(location);
     },
     createImages(_, { urls }, { req }) {
-      const images = urls.map(url => ({ url, owner: req.user.id }));
+      const images = urls.map(url => ({ url, ownerId: req.user.id }));
       return Image.insertMany(images);
     },
     updateImage(_, { image }) {
