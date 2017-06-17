@@ -10,7 +10,7 @@ class User {
   }
 
   get images() {
-    return mongoose.connection.models.Image.find({ people: this.id });
+    return mongoose.connection.models.Image.find({ peopleIds: this.id });
   }
   
 }
