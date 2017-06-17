@@ -55,7 +55,7 @@ input ImageInput {
   id: String!
   url: String
   caption: String
-  location: String
+  locationId: String
   peopleIds: [String]!
 }
 
