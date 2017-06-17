@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
-const Image = require('./Image');
 
 class Location {
 
   get images() {
-    return Image.find({ location: this.id });
+    return mongoose.connection.models.Image.find({ location: this.id });
   }
 
 }

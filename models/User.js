@@ -6,11 +6,11 @@ class User {
 
   get profilePicture() {
     if (!this.profilePictureId) return null;
-    return Image.findById(this.profilePictureId);
+    return mongoose.connection.models.Image.findById(this.profilePictureId);
   }
 
   get images() {
-    return Image.find({ people: this.id });
+    return mongoose.connection.models.Image.find({ people: this.id });
   }
   
 }
