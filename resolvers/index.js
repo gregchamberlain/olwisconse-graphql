@@ -67,7 +67,7 @@ const resolvers = {
     },
     updateProfilePicture(_, { url }, { req }) {
       Image.create({ url, peopleIds: [req.user.id], ownerId: req.user.id }).then(image => {
-        req.user.profilePicture = image.id;
+        req.user.profilePictureId = image.id;
         return req.user.save().then(() => image);
       });
     },
