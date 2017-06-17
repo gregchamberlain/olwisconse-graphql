@@ -56,7 +56,7 @@ input ImageInput {
   url: String
   caption: String
   location: String
-  people: [String]!
+  peopleIds: [String]!
 }
 
 type Mutation {
