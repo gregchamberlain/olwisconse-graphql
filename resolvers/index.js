@@ -31,7 +31,7 @@ const resolvers = {
       return Image.findById(id);
     },
     eras() {
-      return Era.find();
+      return Era.find().sort('-startDate');
     },
     era(_, { id }) {
       return Era.findById(id);
