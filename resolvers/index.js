@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const aws = require('aws-sdk');
 
-const { User, Location, Quote, Image } = require('../models');
+const { User, Location, Quote, Image, Era } = require('../models');
 
 const s3 = new aws.S3();
 
@@ -27,8 +27,14 @@ const resolvers = {
     images() {
       return Image.find();
     },
-    image({ id }) {
+    image(_, { id }) {
       return Image.findById(id);
+    },
+    eras() {
+      return Era.find();
+    },
+    era(_, { id }) {
+      return Era.findById(id);
     }
   },
   Mutation: {
@@ -104,6 +110,12 @@ const resolvers = {
     },
     updateImage(_, { image }) {
       return Image.findByIdAndUpdate(image.id, image, { new: true });
+    },
+    createEra(_, { era }) {
+      return Era.create(era);
+    },
+    updateEra(_, { era }) {
+      return Era.findByIdAndUpdate(era.id, era, { new: true });
     }
   }
 };

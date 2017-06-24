@@ -7,6 +7,13 @@ type User {
   images: [Image]
 }
 
+type Era {
+  id: ID!
+  name: String!
+  startDateISO: String
+  endDateISO: String
+}
+
 type Image {
   id: ID!
   url: String!
@@ -30,6 +37,8 @@ type Query {
   currentUser: User
   users: [User]
   user(username: String!): User
+  eras: [Era]
+  era(id: String!): Era
   locations: [Location]
   location(id: String!): Location
   images: [Image]
@@ -43,12 +52,20 @@ input UserInput {
 }
 
 input LocationInput {
+  id: String
   name: String!
 }
 
 input FileInput {
   name: String!
   type: String!
+}
+
+input EraInput {
+  id: String
+  name: String!
+  startDate: String
+  endDate: String
 }
 
 input ImageInput {
@@ -69,5 +86,7 @@ type Mutation {
   createLocation(location: LocationInput!): Location
   createImages(urls: [String]!): [Image]
   updateImage(image: ImageInput!): Image
+  createEra(era: EraInput): Era
+  updateEra(era: EraInput): Era
 }
 `;
