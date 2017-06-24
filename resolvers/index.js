@@ -65,11 +65,13 @@ const resolvers = {
         return null;
       }
     },
-    updateProfilePicture(_, { url }, { req }) {
-      Image.create({ url, peopleIds: [req.user.id], ownerId: req.user.id }).then(image => {
-        req.user.profilePictureId = image.id;
-        return req.user.save().then(() => image);
-      });
+    updateProfilePicture(_, { id }, { req }) {
+      req.user.profilePictureId = id;
+      return req.user.save();
+      // Image.create({ url, peopleIds: [req.user.id], ownerId: req.user.id }).then(image => {
+      //   req.user.profilePictureId = image.id;
+      //   return req.user.save().then(() => image);
+      // });
     },
     getSignedUrl(_, { filename, filetype}) {
       const params = {

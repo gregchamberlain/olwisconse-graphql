@@ -65,7 +65,7 @@ type Mutation {
   logout: User
   getSignedUrl(filename: String!, filetype: String!): String
   getSignedUrls(files: [FileInput]!): [String]
-  updateProfilePicture(url: String!): Image
+  updateProfilePicture(id: String!): User
   createLocation(location: LocationInput!): Location
   createImages(urls: [String]!): [Image]
   updateImage(image: ImageInput!): Image
