@@ -22,6 +22,10 @@ class Image {
     return this.createdAt.toISOString();
   }
 
+  get era() {
+    return mongoose.connection.models.Era.findById(this.eraId);
+  }
+
 }
 
 const ImageSchema = new mongoose.Schema({
