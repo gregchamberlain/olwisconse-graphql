@@ -10,6 +10,8 @@ type User {
 type Era {
   id: ID!
   name: String!
+  people: [User]
+  images: [Image]
   startDateISO: String
   endDateISO: String
 }
@@ -20,6 +22,7 @@ type Image {
   owner: User
   caption: String
   location: Location
+  era: Era
   people: [User]
   createdAtISO: String
   updatedAt: String
@@ -64,6 +67,7 @@ input FileInput {
 input EraInput {
   id: String
   name: String!
+  peopleIds: [String]
   startDate: String
   endDate: String
 }
@@ -73,6 +77,7 @@ input ImageInput {
   url: String
   caption: String
   locationId: String
+  eraId: String
   peopleIds: [String]!
 }
 
