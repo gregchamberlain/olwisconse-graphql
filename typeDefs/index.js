@@ -10,6 +10,7 @@ type User {
 type Era {
   id: ID!
   name: String!
+  coverPhoto: Image
   people: [User]
   images: [Image]
   startDateISO: String
@@ -69,6 +70,7 @@ input FileInput {
 input EraInput {
   id: String
   name: String!
+  coverPhotoId: String
   peopleIds: [String]
   startDate: String
   endDate: String

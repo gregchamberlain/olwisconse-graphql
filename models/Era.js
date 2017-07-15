@@ -11,6 +11,11 @@ class Era {
     return this.endDate && this.endDate.toISOString();
   }
 
+  get coverPhoto() {
+    if (!this.coverPhotoId) return null;
+    return mongoose.connection.models.Image.findById(this.coverPhotoId);
+  }
+
   get images() {
     return mongoose.connection.models.Image.find({ eraId: this.id });
   }
@@ -25,6 +30,7 @@ class Era {
 const EraSchema = new mongoose.Schema({
   name: { type: String, required: true },
   peopleIds: [{type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  coverPhotoId: { type: mongoose.Schema.Types.ObjectId, ref: 'Image' },
   startDate: { type: Date },
   endDate: { type: Date }
 }, {
