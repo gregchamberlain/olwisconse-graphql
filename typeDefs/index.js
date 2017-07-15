@@ -31,6 +31,7 @@ type Image {
 type Location {
   id: ID!
   name: String!
+  coverPhoto: Image
   images: [Image]
   createdAt: String
   updatedAt: String
@@ -57,6 +58,7 @@ input UserInput {
 input LocationInput {
   id: String
   name: String!
+  coverPhotoId: String
 }
 
 input FileInput {
@@ -90,6 +92,7 @@ type Mutation {
   updateProfilePicture(id: String!): User
   createLocation(location: LocationInput!): Location
   createImages(urls: [String]!): [Image]
+  updateLocation(location: LocationInput!): Location!
   updateImage(image: ImageInput!): Image
   createEra(era: EraInput): Era
   updateEra(era: EraInput): Era

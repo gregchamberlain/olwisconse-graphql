@@ -104,6 +104,9 @@ const resolvers = {
     createLocation(_, { location }) {
       return Location.create(location);
     },
+    updateLocation(_, { location }) {
+      return Location.findByIdAndUpdate(location.id, location, { new: true })
+    },
     createImages(_, { urls }, { req }) {
       const images = urls.map(url => ({ url, ownerId: req.user.id }));
       return Image.insertMany(images);
