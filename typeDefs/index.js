@@ -1,10 +1,21 @@
 module.exports = `
+scalar JSON
+
 type User {
   id: ID!
   profilePicture: Image
   username: String!
   displayName: String!
   images: [Image]
+}
+
+type Post {
+  id: ID!
+  body: JSON!
+  owner: User
+  people: [User]
+  location: Location
+  era: Era
 }
 
 type Era {
@@ -48,12 +59,21 @@ type Query {
   location(id: String!): Location
   images: [Image]
   image(id: String!): Image
+  posts: [Post]
 }
 
 input UserInput {
   username: String!
   displayName: String
   password: String!
+}
+
+input PostInput {
+  id: String
+  body: JSON!
+  peopleIds: [String]
+  locationId: String
+  eraId: String
 }
 
 input LocationInput {
@@ -98,5 +118,7 @@ type Mutation {
   updateImage(image: ImageInput!): Image
   createEra(era: EraInput): Era
   updateEra(era: EraInput): Era
+  createPost(post: PostInput): Post
+  updatePost(post: PostInput): Post
 }
 `;

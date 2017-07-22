@@ -1,13 +1,15 @@
+const GraphQLJSON = require('graphql-type-json');
 const bcrypt = require('bcrypt');
 const aws = require('aws-sdk');
 
-const { User, Location, Quote, Image, Era } = require('../models');
+const { User, Location, Quote, Image, Era, Post } = require('../models');
 
 const s3 = new aws.S3();
 
 const generateSessionToken = () => Math.random().toString(36).substring(7);
 
 const resolvers = {
+  JSON: GraphQLJSON,
   Query: {
     currentUser(_, args, { req }) {
       return req.user;
@@ -35,6 +37,9 @@ const resolvers = {
     },
     era(_, { id }) {
       return Era.findById(id);
+    },
+    posts() {
+      return Post.find();
     }
   },
   Mutation: {
@@ -119,6 +124,14 @@ const resolvers = {
     },
     updateEra(_, { era }) {
       return Era.findByIdAndUpdate(era.id, era, { new: true });
+    },
+    createPost(_, { post }, { req }) {
+      if (!req.user) throw new Error('You must sign in to create a post');
+      post.ownerId = req.user.id
+      return Post.create(post);
+    },
+    updatePost(_, { post }) {
+      return Post.findByIdAndUpdate(post.id, post, { new: true });
     }
   }
 };
