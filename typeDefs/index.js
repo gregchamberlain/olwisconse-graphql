@@ -4,6 +4,7 @@ scalar JSON
 type User {
   id: ID!
   profilePicture: Image
+  posts: [Post]
   username: String!
   displayName: String!
   images: [Image]
