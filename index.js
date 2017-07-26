@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const { graphqlExpress, graphiqlExpress } = require('graphql-server-express');
 const { makeExecutableSchema } = require('graphql-tools');
 const { execute, subscribe } = require('graphql');
-const { createServer } = require('http');
+const { createServer } = process.env.NODE_ENV === 'production' ? require('https') : require('http');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
 
 mongoose.Promise = global.Promise;
