@@ -49,7 +49,7 @@ const resolvers = {
     },
     channel(_, { id }, { req }) {
       if (!req.user) throw new Error('You must sign in.');
-      return Channel.find({ peopleIds: req.user.id, _id: id })
+      return Channel.findById(id);
     },
     messages(_, { channelId, limit = 20 }) {
       return Message.find({ channelId }).limit(limit);
