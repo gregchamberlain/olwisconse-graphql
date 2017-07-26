@@ -1,10 +1,12 @@
 const GraphQLJSON = require('graphql-type-json');
 const bcrypt = require('bcrypt');
 const aws = require('aws-sdk');
+const { PubSub, withFilter } = require('graphql-subscriptions');
 
-const { User, Location, Quote, Image, Era, Post } = require('../models');
+const { User, Location, Quote, Image, Era, Post, Channel, Message } = require('../models');
 
 const s3 = new aws.S3();
+const pubsub = new PubSub();
 
 const generateSessionToken = () => Math.random().toString(36).substring(7);
 
@@ -40,6 +42,17 @@ const resolvers = {
     },
     posts() {
       return Post.find();
+    },
+    channels(_, args, { req }) {
+      if (!req.user) throw new Error('You must sign in.');
+      return Channel.find({ peopleIds: req.user.id });
+    },
+    channel(_, { id }, { req }) {
+      if (!req.user) throw new Error('You must sign in.');
+      return Channel.find({ peopleIds: req.user.id, _id: id })
+    },
+    messages(_, { channelId, limit = 20 }) {
+      return Message.find({ channelId }).limit(limit);
     }
   },
   Mutation: {
@@ -132,6 +145,35 @@ const resolvers = {
     },
     updatePost(_, { post }) {
       return Post.findByIdAndUpdate(post.id, post, { new: true });
+    },
+    createChannel(_, { channel }, { req }) {
+      if (!req.user) throw new Error('You must sign in to create a channel');
+      if (!channel.peopleIds) channel.peopleIds = [req.user.id];
+      if (!channel.peopleIds.includes(req.user.id)) channel.peopleIds.unshift(req.user.id);
+      channel.ownerId = req.user.id;
+      return Channel.create(channel);
+    },
+    updateChannel(_, { channel }, { req }) {
+      if (!req.user) throw new Error('You must sign in to update a channel');
+      if (!channel.peopleIds.includes(req.user.id)) channel.peopleIds.unshift(req.user.id);
+      return Channel.findByIdAndUpdate(channel.id, channel, { new: true });
+    },
+    sendMessage(_, { channelId, message }, { req }) {
+      if (!req.user) throw new Error('You must sign in to send a message');
+      message.channelId = channelId;
+      message.ownerId = req.user.id;
+      return Message.create(message).then((newMessage) => {
+        pubsub.publish('newMessage', { newMessage, channelId });
+        return newMessage;
+      });
+    }
+  },
+  Subscription: {
+    newMessage: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator('newMessage'),
+        (payload, variables) =>  payload.channelId === variables.channelId
+      )
     }
   }
 };

@@ -6,6 +6,9 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { graphqlExpress, graphiqlExpress } = require('graphql-server-express');
 const { makeExecutableSchema } = require('graphql-tools');
+const { execute, subscribe } = require('graphql');
+const { createServer } = require('http');
+const { SubscriptionServer } = require('subscriptions-transport-ws');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI).then(() => {
@@ -47,12 +50,23 @@ app.use('/graphql', bodyParser.json(), (req, res, next) => graphqlExpress({
   context: { req, res }
 })(req, res, next));
 
+const PORT = process.env.PORT || 3000;
+
 app.use('/graphiql', graphiqlExpress({
   endpointURL: '/graphql',
+  subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`
 }));
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, (err) => {
+const ws = createServer(app);
+ws.listen(PORT, (err) => {
   if (err) return console.error(err);
-  console.log('Server listening at http://localhost:' + PORT);
+  console.log('Server listening at http://localhost:' + PORT, '(with subscriptions!)');
+  new SubscriptionServer({
+    execute,
+    subscribe,
+    schema
+  }, {
+    server: ws,
+    path: '/subscriptions',
+  });
 });

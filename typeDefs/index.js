@@ -50,6 +50,22 @@ type Location {
   updatedAt: String
 }
 
+type Channel {
+  id: ID!
+  name: String!
+  owner: User!
+  people: [User]
+  messages(limit: Int): [Message]
+}
+
+type Message {
+  id: ID!
+  text: String!
+  owner: User!
+  ownerId: ID!
+  createdAtISO: String
+}
+
 type Query {
   currentUser: User
   users: [User]
@@ -61,6 +77,9 @@ type Query {
   images: [Image]
   image(id: String!): Image
   posts: [Post]
+  channels: [Channel]
+  channel(id: String!): Channel
+  messages(channelId: String!, limit: Int): [Message]
 }
 
 input UserInput {
@@ -98,12 +117,22 @@ input EraInput {
 }
 
 input ImageInput {
-  id: String!
+  id: String
   url: String
   caption: String
   locationId: String
   eraId: String
   peopleIds: [String]!
+}
+
+input ChannelInput {
+  id: String
+  name: String!
+  peopleIds: [String]
+}
+
+input MessageInput {
+  text: String!
 }
 
 type Mutation {
@@ -121,5 +150,12 @@ type Mutation {
   updateEra(era: EraInput): Era
   createPost(post: PostInput): Post
   updatePost(post: PostInput): Post
+  createChannel(channel: ChannelInput!): Channel
+  updateChannel(channel: ChannelInput!): Channel
+  sendMessage(channelId: String, message: MessageInput): Message
+}
+
+type Subscription {
+  newMessage(channelId: String!): Message
 }
 `;
