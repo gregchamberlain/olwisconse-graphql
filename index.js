@@ -7,7 +7,7 @@ const mongoose = require('mongoose');
 const { graphqlExpress, graphiqlExpress } = require('graphql-server-express');
 const { makeExecutableSchema } = require('graphql-tools');
 const { execute, subscribe } = require('graphql');
-const { createServer } = process.env.NODE_ENV === 'production' ? require('https') : require('http');
+const { createServer } = require('http');
 const { SubscriptionServer } = require('subscriptions-transport-ws');
 
 mongoose.Promise = global.Promise;
@@ -51,14 +51,14 @@ app.use('/graphql', bodyParser.json(), (req, res, next) => graphqlExpress({
 })(req, res, next));
 
 const PORT = process.env.PORT || 3000;
-let HOST = 'ws://localhost'
+let subscriptionsEndpoint = `ws://localhost:${PORT}/subscriptions`
 if (process.env.NODE_ENV === 'production') {
-  HOST = 'wss://olwisconse-graphql.herokuapp.com'
+  HOST = 'wss://olwisconse-graphql.herokuapp.com/subscriptions'
 }
 
 app.use('/graphiql', graphiqlExpress({
   endpointURL: '/graphql',
-  subscriptionsEndpoint: `${HOST}:${PORT}/subscriptions`
+  subscriptionsEndpoint
 }));
 
 const ws = createServer(app);
