@@ -53,7 +53,7 @@ app.use('/graphql', bodyParser.json(), (req, res, next) => graphqlExpress({
 const PORT = process.env.PORT || 3000;
 let subscriptionsEndpoint = `ws://localhost:${PORT}/subscriptions`
 if (process.env.NODE_ENV === 'production') {
-  HOST = 'wss://olwisconse-graphql.herokuapp.com/subscriptions'
+  subscriptionsEndpoint = 'wss://olwisconse-graphql.herokuapp.com/subscriptions'
 }
 
 app.use('/graphiql', graphiqlExpress({
