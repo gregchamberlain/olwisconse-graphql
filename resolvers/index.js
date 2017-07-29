@@ -2,6 +2,8 @@ const GraphQLJSON = require('graphql-type-json');
 const bcrypt = require('bcrypt');
 const aws = require('aws-sdk');
 const { PubSub, withFilter } = require('graphql-subscriptions');
+import Expo from 'exponent-server-sdk';
+import { sendNotifications } from '../utils/Notification';
 
 const { User, Location, Quote, Image, Era, Post, Channel, Message } = require('../models');
 
@@ -92,7 +94,7 @@ const resolvers = {
     logout(_, args, { req, res }) {
       if (req.user) {
         res.clearCookie(process.env.SESSION_COOKIE_NAME);
-        req.user.sessions = req.user.sessions.filter(session => session.token === req.sessionToken);
+        req.user.sessions = req.user.sessions.filter(session => session.token !== req.sessionToken);
         return req.user.save().then(() => req.user);
       } else {
         return null;
@@ -168,6 +170,24 @@ const resolvers = {
       message.channelId = channelId;
       message.ownerId = req.user.id;
       return Message.create(message).then((newMessage) => {
+        Channel.findById(channelId).populate('peopleIds').then(channel => {
+          const tokens = [];
+          channel.peopleIds.forEach(user => {
+            if (user.id === req.user.id) return;
+            user.sessions.forEach(session => {
+              if (session.pushTokens &&
+                  session.pushTokens.expo &&
+                  Expo.isExponentPushToken(session.pushTokens.expo)) tokens.push(session.pushTokens.expo);
+            });
+          });
+          const notifications = tokens.map(to => ({
+            to,
+            title: channel.name,
+            body: newMessage.text,
+            priority: 'high'
+          }))
+          sendNotifications(notifications);
+        });
         pubsub.publish('newMessage', { newMessage, channelId });
         return newMessage;
       });
