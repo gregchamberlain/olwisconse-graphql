@@ -59,16 +59,17 @@ const resolvers = {
     signup(_, { user, device }, { res }) {
       const salt = bcrypt.genSaltSync(10);
       const passwordDigest = bcrypt.hashSync(user.password, salt);
+      const sessionToken = generateSessionToken();
       return User.create({
         username: user.username.toLowerCase(),
         displayName: user.displayName,
         passwordDigest,
         sessions: [{
-          token: generateSessionToken(),
+          token: sessionToken,
           device
         }]
       }).then(newUser => {
-        res.cookie(process.env.SESSION_COOKIE_NAME, newUser.sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+        res.cookie(process.env.SESSION_COOKIE_NAME, sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
         return newUser;
       });
     },
@@ -76,12 +77,13 @@ const resolvers = {
       return User.findOne({ username: user.username.toLowerCase() }).then(currentUser => {
         if (!currentUser) throw new Error('User does not exist.');
         if (bcrypt.compareSync(user.password, currentUser.passwordDigest)) {
-          res.cookie(process.env.SESSION_COOKIE_NAME, currentUser.sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+          const sessionToken = generateSessionToken();
+          res.cookie(process.env.SESSION_COOKIE_NAME, sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
           currentUser.sessions.push({
-            token: generateSessionToken(),
+            token: sessionToken,
             device
           });
-          return currentUser;
+          return currentUser.save().then(() => currentUser);
         } else {
           throw new Error('Invalid password for that username.')
         }
