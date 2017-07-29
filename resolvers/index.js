@@ -171,6 +171,13 @@ const resolvers = {
         pubsub.publish('newMessage', { newMessage, channelId });
         return newMessage;
       });
+    },
+    setPushTokens(_, { pushTokens }, { req }) {
+      const session = req.user.sessions.filter(s => s.token === req.sessionToken)[0];
+      Object.keys(pushTokens).forEach(key => {
+        session.pushTokens[key] = pushTokens[key]
+      });
+      return req.user.save().then(() => true);
     }
   },
   Subscription: {
