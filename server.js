@@ -32,8 +32,9 @@ app.use(cors({
 const User = require('./models/User');
 
 app.use(cookieParser(), (req, res, next) => {
-  if (req.header('X-Forwarded-For') && req.header('X-Forwarded-For').origin) {
-    const ips = req.header('X-Forwarded-For').origin.split(',');
+  console.log(req.headers);
+  if (req.header('x-forwarded-for') && req.header('x-forwarded-for').origin) {
+    const ips = req.header('x-forwarded-for').origin.split(',');
     const ip = ips[ips.length - 1];
     console.log(ip);
   } else {
