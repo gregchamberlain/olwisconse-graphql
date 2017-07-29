@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const Image = require('./Image');
-
 class User {
 
   get profilePicture() {
@@ -24,7 +22,17 @@ const UserSchema = new mongoose.Schema({
   displayName: { type: String, required: true },
   profilePictureId: { type: mongoose.Schema.Types.ObjectId, ref: 'Image' },
   passwordDigest: { type: String, required: true },
-  sessionToken: { type: String, required: true, unique: true }
+  sessionToken: { type: String, required: true, unique: true },
+  sessions: [{
+    token: { type: String, require: true, unique: true },
+    device: {
+      id: String,
+      name: String
+    },
+    pushTokens: {
+      expo: String
+    }
+  }] 
 }, {
   timestamps: true
 });

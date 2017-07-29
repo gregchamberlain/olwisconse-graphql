@@ -8,6 +8,11 @@ type User {
   username: String!
   displayName: String!
   images: [Image]
+  pushTokens: PushTokens
+}
+
+type PushTokens {
+  expo: String
 }
 
 type Post {
@@ -88,6 +93,15 @@ input UserInput {
   password: String!
 }
 
+input DeviceInput {
+  id: String
+  name: String
+}
+
+input PushTokensInput {
+  expo: String
+}
+
 input PostInput {
   id: String
   body: JSON!
@@ -136,8 +150,8 @@ input MessageInput {
 }
 
 type Mutation {
-  signup(user: UserInput!): User
-  login(user: UserInput!): User
+  signup(user: UserInput!, device: DeviceInput): User
+  login(user: UserInput!, device: DeviceInput): User
   logout: User
   getSignedUrl(filename: String!, filetype: String!): String
   getSignedUrls(files: [FileInput]!): [String]
@@ -153,6 +167,7 @@ type Mutation {
   createChannel(channel: ChannelInput!): Channel
   updateChannel(channel: ChannelInput!): Channel
   sendMessage(channelId: String, message: MessageInput): Message
+  setPushTokens(pushTokens: PushTokensInput!): Boolean
 }
 
 type Subscription {

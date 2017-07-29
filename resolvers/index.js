@@ -56,24 +56,31 @@ const resolvers = {
     }
   },
   Mutation: {
-    signup(_, { user }, { res }) {
+    signup(_, { user, device }, { res }) {
       const salt = bcrypt.genSaltSync(10);
       const passwordDigest = bcrypt.hashSync(user.password, salt);
       return User.create({
         username: user.username.toLowerCase(),
         displayName: user.displayName,
         passwordDigest,
-        sessionToken: generateSessionToken()
+        sessions: [{
+          token: generateSessionToken(),
+          device
+        }]
       }).then(newUser => {
         res.cookie(process.env.SESSION_COOKIE_NAME, newUser.sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
         return newUser;
       });
     },
-    login(_, { user }, { res }) {
+    login(_, { user, device }, { res }) {
       return User.findOne({ username: user.username.toLowerCase() }).then(currentUser => {
         if (!currentUser) throw new Error('User does not exist.');
         if (bcrypt.compareSync(user.password, currentUser.passwordDigest)) {
           res.cookie(process.env.SESSION_COOKIE_NAME, currentUser.sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+          currentUser.sessions.push({
+            token: generateSessionToken(),
+            device
+          });
           return currentUser;
         } else {
           throw new Error('Invalid password for that username.')
@@ -83,7 +90,7 @@ const resolvers = {
     logout(_, args, { req, res }) {
       if (req.user) {
         res.clearCookie(process.env.SESSION_COOKIE_NAME);
-        req.user.sessionToken = generateSessionToken();
+        req.user.sessions = req.user.sessions.filter(session => session.token === req.sessionToken);
         return req.user.save().then(() => req.user);
       } else {
         return null;
@@ -92,10 +99,6 @@ const resolvers = {
     updateProfilePicture(_, { id }, { req }) {
       req.user.profilePictureId = id;
       return req.user.save();
-      // Image.create({ url, peopleIds: [req.user.id], ownerId: req.user.id }).then(image => {
-      //   req.user.profilePictureId = image.id;
-      //   return req.user.save().then(() => image);
-      // });
     },
     getSignedUrl(_, { filename, filetype}) {
       const params = {

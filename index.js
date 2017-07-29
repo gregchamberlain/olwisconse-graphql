@@ -34,7 +34,8 @@ const User = require('./models/User');
 app.use(cookieParser(), (req, res, next) => {
   const sessionToken = req.cookies[process.env.SESSION_COOKIE_NAME];
   if (sessionToken) {
-    User.findOne({ sessionToken }).then(user => {
+    User.findOne({ 'sessions.token': sessionToken }).then(user => {
+      req.sessionToken = sessionToken;
       req.user = user;
       next();
     }).catch(err => {
