@@ -82,7 +82,7 @@ const resolvers = {
           const sessionToken = generateSessionToken();
           res.cookie(process.env.SESSION_COOKIE_NAME, sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
           currentUser.sessions = currentUser.sessions.filter(session => {
-            if (!session.device) return true;
+            if (!(session.device && device)) return true;
             return session.device.id !== device.id;
           });
           currentUser.sessions.push({
