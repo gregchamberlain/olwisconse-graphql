@@ -187,7 +187,7 @@ const resolvers = {
           const notifications = tokens.map(to => ({
             to,
             title: channel.name,
-            body: newMessage.text,
+            body: `${req.user.displayName}: ${newMessage.text}`,
             priority: 'high'
           }))
           sendNotifications(notifications);
