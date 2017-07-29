@@ -32,6 +32,13 @@ app.use(cors({
 const User = require('./models/User');
 
 app.use(cookieParser(), (req, res, next) => {
+  if (req.header('X-Forwarded-For') && req.header('X-Forwarded-For').origin) {
+    const ips = req.header('X-Forwarded-For').origin.split(',');
+    const ip = ips[ips.length - 1];
+    console.log(ip);
+  } else {
+    console.log('no ip');
+  }
   const sessionToken = req.cookies[process.env.SESSION_COOKIE_NAME];
   if (sessionToken) {
     User.findOne({ 'sessions.token': sessionToken }).then(user => {
