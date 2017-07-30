@@ -75,6 +75,7 @@ type Query {
   currentUser: User
   users: [User]
   user(username: String!): User
+  userById(id: String!): User
   eras: [Era]
   era(id: String!): Era
   locations: [Location]

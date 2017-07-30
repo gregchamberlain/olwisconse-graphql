@@ -24,6 +24,9 @@ const resolvers = {
     user(_, { username }) {
       return User.findOne({ username });
     },
+    userById(_, { id }) {
+      return User.findById(id);
+    },
     locations() {
       return Location.find();
     },
