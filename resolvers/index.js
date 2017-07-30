@@ -190,8 +190,11 @@ const resolvers = {
             body: `${req.user.displayName}: ${newMessage.text}`,
             priority: 'high',
             data: {
-              type: 'CHAT_MESSAGE',
-              channelId: channel.id
+              routeName: 'Chat',
+              params: {
+                channelId: channel.id,
+                channelName: channel.name
+              }
             }
           }))
           sendNotifications(notifications);
