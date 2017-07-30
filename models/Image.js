@@ -26,6 +26,13 @@ class Image {
     return mongoose.connection.models.Era.findById(this.eraId);
   }
 
+  get thumbnailUrl() {
+    const split = this.url.split('/');
+    const file = split[split.length - 1];
+    const name = file.split('.')[0]
+    return `https://s3.amazonaws.com/olwisconseresized/resized-${name}.jpg`
+  }
+
 }
 
 const ImageSchema = new mongoose.Schema({

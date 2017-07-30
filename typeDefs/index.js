@@ -37,6 +37,7 @@ type Era {
 type Image {
   id: ID!
   url: String!
+  thumbnailUrl: String
   owner: User
   caption: String
   location: Location
