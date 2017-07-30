@@ -1,11 +1,12 @@
-const GraphQLJSON = require('graphql-type-json');
-const bcrypt = require('bcrypt');
-const aws = require('aws-sdk');
-const { PubSub, withFilter } = require('graphql-subscriptions');
+import GraphQLJSON from 'graphql-type-json'
+import bcrypt from 'bcrypt'
+import aws from 'aws-sdk'
+import { PubSub, withFilter } from 'graphql-subscriptions'
 import Expo from 'exponent-server-sdk';
+
 import { sendNotifications } from '../utils/Notification';
 
-const { User, Location, Quote, Image, Era, Post, Channel, Message } = require('../models');
+import { User, Location, Quote, Image, Era, Post, Channel, Message } from '../models';
 
 const s3 = new aws.S3();
 const pubsub = new PubSub();
@@ -61,11 +62,11 @@ const resolvers = {
     }
   },
   Mutation: {
-    signup(_, { user, device }, { res }) {
+    async signup(_, { user, device }, { res }) {
       const salt = bcrypt.genSaltSync(10);
       const passwordDigest = bcrypt.hashSync(user.password, salt);
       const sessionToken = generateSessionToken();
-      return User.create({
+      const newUser = await User.create({
         username: user.username.toLowerCase(),
         displayName: user.displayName,
         passwordDigest,
@@ -73,39 +74,35 @@ const resolvers = {
           token: sessionToken,
           device
         }]
-      }).then(newUser => {
-        res.cookie(process.env.SESSION_COOKIE_NAME, sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
-        return newUser;
       });
+      res.cookie(process.env.SESSION_COOKIE_NAME, sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+      return newUser;
     },
-    login(_, { user, device }, { res }) {
-      return User.findOne({ username: user.username.toLowerCase() }).then(currentUser => {
-        if (!currentUser) throw new Error('User does not exist.');
-        if (bcrypt.compareSync(user.password, currentUser.passwordDigest)) {
-          const sessionToken = generateSessionToken();
-          res.cookie(process.env.SESSION_COOKIE_NAME, sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
-          currentUser.sessions = currentUser.sessions.filter(session => {
-            if (!(session.device && device)) return true;
-            return session.device.id !== device.id;
-          });
-          currentUser.sessions.push({
-            token: sessionToken,
-            device
-          });
-          return currentUser.save().then(() => currentUser);
-        } else {
-          throw new Error('Invalid password for that username.')
-        }
-      })
-    },
-    logout(_, args, { req, res }) {
-      if (req.user) {
-        res.clearCookie(process.env.SESSION_COOKIE_NAME);
-        req.user.sessions = req.user.sessions.filter(session => session.token !== req.sessionToken);
-        return req.user.save().then(() => req.user);
-      } else {
-        return null;
+    async login(_, { user, device }, { res }) {
+      const currentUser = await User.findOne({ username: user.username.toLowerCase() });
+      if (!currentUser) throw new Error('Account with that username does not exist');
+      if (!bcrypt.compareSync(user.password, currentUser.passwordDigest)) {
+        throw new Error('Incorrect password for that username.');
       }
+      const sessionToken = generateSessionToken();
+      res.cookie(process.env.SESSION_COOKIE_NAME, sessionToken, { maxAge: 1000 * 60 * 60 * 24 * 365 });
+      // Remove old sessions from the same device.
+      currentUser.session = currentUser.sessions.filter(session => {
+        if (!(session.device && device)) return true;
+        return session.device.id !== device.id;
+      });
+      currentUser.sessions.push({
+        token: sessionToken,
+        device
+      });
+      return currentUser.save();
+    },
+    async logout(_, args, { req, res }) {
+      if (!req.user) return null;
+      res.clearCookie(process.env.SESSION_COOKIE_NAME);
+      req.user.sessions = req.user.sessions.filter((session) => session.token !== req.sessionToken);
+      return req.user.save();
+      // return req.user;
     },
     updateProfilePicture(_, { id }, { req }) {
       req.user.profilePictureId = id;

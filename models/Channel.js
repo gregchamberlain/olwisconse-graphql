@@ -1,14 +1,18 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
-class Channel {
+
+import { User, Message } from './';
+import BaseModel from './BaseModel';
+
+class Channel extends BaseModel {
 
   get owner() {
-    return mongoose.connection.models.User.findById(this.ownerId);
+    return User.findById(this.ownerId);
   }
 
   get people() {
     if (!this.peopleIds.length) return this.peopleIds;
-    return mongoose.connection.models.User.find({ _id: { $in: this.peopleIds } });
+    return User.find({ _id: { $in: this.peopleIds } });
   }
 
   get createdAtISO() {
@@ -26,9 +30,12 @@ const ChannelSchema = new mongoose.Schema({
   ownerId: {type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   peopleIds: [{type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, {
-  timestamps: true
+  timestamps: {
+    createdAt: '_createdAt',
+    updatedAt: '_updatedAt'
+  }
 });
 
 ChannelSchema.loadClass(Channel);
 
-module.exports = mongoose.model('Channel', ChannelSchema);
+export default mongoose.model('Channel', ChannelSchema);

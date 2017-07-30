@@ -1,21 +1,21 @@
 const mongoose = require('mongoose');
 
-const User = require('./User');
-const Location = require('./Location');
+import { User, Location, Era } from './';
+import BaseModel from './BaseModel';
 
-class Image {
+class Image extends BaseModel {
 
   get owner() {
-    return mongoose.connection.models.User.findById(this.ownerId);
+    return User.findById(this.ownerId);
   }
 
   get location() {
-    return mongoose.connection.models.Location.findById(this.locationId);
+    return Location.findById(this.locationId);
   }
 
   get people() {
     if (!this.peopleIds.length) return this.peopleIds;
-    return mongoose.connection.models.User.find({ _id: { $in: this.peopleIds } });
+    return User.find({ _id: { $in: this.peopleIds } });
   }
 
   get createdAtISO() {
@@ -23,7 +23,7 @@ class Image {
   }
 
   get era() {
-    return mongoose.connection.models.Era.findById(this.eraId);
+    return Era.findById(this.eraId);
   }
 
   get thumbnailUrl() {
@@ -43,9 +43,12 @@ const ImageSchema = new mongoose.Schema({
   ownerId: {type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   peopleIds: [{type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, {
-  timestamps: true
+  timestamps: {
+    createdAt: '_createdAt',
+    updatedAt: '_updatedAt'
+  }
 });
 
 ImageSchema.loadClass(Image);
 
-module.exports = mongoose.model('Image', ImageSchema);
+export default mongoose.model('Image', ImageSchema);

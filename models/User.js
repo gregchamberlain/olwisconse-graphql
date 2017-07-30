@@ -1,18 +1,21 @@
 const mongoose = require('mongoose');
 
-class User {
+import { Image, Post } from './';
+import BaseModel from './BaseModel';
+
+class User extends BaseModel {
 
   get profilePicture() {
     if (!this.profilePictureId) return null;
-    return mongoose.connection.models.Image.findById(this.profilePictureId);
+    return Image.findById(this.profilePictureId);
   }
 
   get images() {
-    return mongoose.connection.models.Image.find({ peopleIds: this.id });
+    return Image.find({ peopleIds: this.id });
   }
 
   get posts() {
-    return mongoose.connection.models.Post.find({ peopleIds: this.id });
+    return Post.find({ peopleIds: this.id });
   }
   
 }
@@ -34,9 +37,11 @@ const UserSchema = new mongoose.Schema({
     }
   }] 
 }, {
-  timestamps: true
+  timestamps: {
+    createdAt: '_createdAt',
+    updatedAt: '_updatedAt'
+  }
 });
 
 UserSchema.loadClass(User);
-
-module.exports = mongoose.model('User', UserSchema);
+export default mongoose.model('User', UserSchema);

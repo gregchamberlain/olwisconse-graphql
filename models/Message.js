@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 
-class Message {
+import { User } from './';
+import BaseModel from './BaseModel';
+
+class Message extends BaseModel {
 
   get owner() {
-    return mongoose.connection.models.User.findById(this.ownerId);
+    return User.findById(this.ownerId);
   }
 
   get createdAtISO() {
@@ -17,9 +20,12 @@ const MessageSchema = new mongoose.Schema({
   channelId: { type: mongoose.Schema.Types.ObjectId, ref: 'Channel' },
   ownerId: {type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, {
-  timestamps: true
+  timestamps: {
+    createdAt: '_createdAt',
+    updatedAt: '_updatedAt'
+  }
 });
 
 MessageSchema.loadClass(Message);
 
-module.exports = mongoose.model('Message', MessageSchema);
+export default mongoose.model('Message', MessageSchema);

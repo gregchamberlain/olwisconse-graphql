@@ -9,6 +9,8 @@ type User {
   displayName: String!
   images: [Image]
   pushTokens: PushTokens
+  createdAt: String!
+  updatedAT: String!
 }
 
 type PushTokens {
@@ -22,6 +24,8 @@ type Post {
   people: [User]
   location: Location
   era: Era
+  createdAt: String!
+  updatedAT: String!
 }
 
 type Era {
@@ -30,8 +34,10 @@ type Era {
   coverPhoto: Image
   people: [User]
   images: [Image]
-  startDateISO: String
-  endDateISO: String
+  startDate: String
+  endDate: String
+  createdAt: String!
+  updatedAT: String!
 }
 
 type Image {
@@ -43,8 +49,8 @@ type Image {
   location: Location
   era: Era
   people: [User]
-  createdAtISO: String
-  updatedAt: String
+  createdAt: String!
+  updatedAT: String!
 }
 
 type Location {
@@ -62,6 +68,8 @@ type Channel {
   owner: User!
   people: [User]
   messages(limit: Int): [Message]
+  createdAt: String!
+  updatedAt: String!
 }
 
 type Message {
@@ -69,7 +77,8 @@ type Message {
   text: String!
   owner: User!
   ownerId: ID!
-  createdAtISO: String
+  createdAt: String!
+  updatedAT: String!
 }
 
 type Query {
