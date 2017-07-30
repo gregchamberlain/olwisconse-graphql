@@ -188,7 +188,11 @@ const resolvers = {
             to,
             title: channel.name,
             body: `${req.user.displayName}: ${newMessage.text}`,
-            priority: 'high'
+            priority: 'high',
+            data: {
+              type: 'CHAT_MESSAGE',
+              channelId: channel.id
+            }
           }))
           sendNotifications(notifications);
         });
