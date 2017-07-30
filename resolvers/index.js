@@ -54,7 +54,7 @@ const resolvers = {
       return Channel.findById(id);
     },
     messages(_, { channelId, limit = 20 }) {
-      return Message.find({ channelId }).limit(limit);
+      return Message.find({ channelId }).sort('-createdAt').limit(limit);
     }
   },
   Mutation: {

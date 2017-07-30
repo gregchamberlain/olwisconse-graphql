@@ -16,7 +16,7 @@ class Channel {
   }
 
   messages({ limit = 20 }) {
-    return mongoose.connection.models.Message.find({ channelId: this._id }).limit(limit);
+    return mongoose.connection.models.Message.find({ channelId: this._id }).sort('-createdAt').limit(limit);
   }
 
 }
