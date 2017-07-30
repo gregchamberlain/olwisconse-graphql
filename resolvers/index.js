@@ -41,7 +41,7 @@ const resolvers = {
       return Image.findById(id);
     },
     eras() {
-      return Era.find().sort('-startDate');
+      return Era.find().sort('-_startDate');
     },
     era(_, { id }) {
       return Era.findById(id);
@@ -58,7 +58,7 @@ const resolvers = {
       return Channel.findById(id);
     },
     messages(_, { channelId, limit = 20 }) {
-      return Message.find({ channelId }).sort('-createdAt').limit(limit);
+      return Message.find({ channelId }).sort('-_createdAt').limit(limit);
     }
   },
   Mutation: {

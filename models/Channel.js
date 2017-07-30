@@ -20,7 +20,7 @@ class Channel extends BaseModel {
   }
 
   messages({ limit = 20 }) {
-    return mongoose.connection.models.Message.find({ channelId: this._id }).sort('-createdAt').limit(limit);
+    return mongoose.connection.models.Message.find({ channelId: this._id }).sort('-_createdAt').limit(limit);
   }
 
 }
