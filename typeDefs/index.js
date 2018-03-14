@@ -10,7 +10,7 @@ type User {
   images: [Image]
   pushTokens: PushTokens
   createdAt: String!
-  updatedAT: String!
+  updatedAt: String!
 }
 
 type PushTokens {
@@ -25,7 +25,7 @@ type Post {
   location: Location
   era: Era
   createdAt: String!
-  updatedAT: String!
+  updatedAt: String!
 }
 
 type Era {
@@ -37,7 +37,7 @@ type Era {
   startDate: String
   endDate: String
   createdAt: String!
-  updatedAT: String!
+  updatedAt: String!
 }
 
 type Image {
